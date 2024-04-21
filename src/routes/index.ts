@@ -3,7 +3,7 @@ import AdminController from "../controllers/AdminCont";
 
 const routes = Router();
 
-routes.post("/admin/register", AdminController.register);
-routes.post("/admin/login", AdminController.login);
+routes.post("/register", AdminController.register);
+routes.post("/login", AdminController.login);
 
 export default routes;
