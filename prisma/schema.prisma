@@ -1,0 +1,149 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  email String @unique
+  password String
+  role String @default("user")
+  profile Profile?
+  address Address[]
+  review Review[]
+  cart Cart[]
+  transaction Transaction[]
+  wishlist Wishlist[]
+}
+
+model Profile {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name String? @db.VarChar(100)
+  avatar String? @default("https://res.cloudinary.com/dydmnzkfh/image/upload/v1713671817/ekv4nylpxrwvmacu2cbj.jpg")
+  userId Int @unique
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Address {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name String @db.VarChar(100)
+  street String
+  regency String
+  city String
+  province String
+  postalCode String
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+model Category {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  name String @db.VarChar(100)
+  parentCategoryId Int?
+  parentCategory Category? @relation("ParentSub", fields: [parentCategoryId], references: [id])
+  subCategory Category[] @relation("ParentSub")
+  product Product[]
+}
+
+model Product {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name String @db.VarChar(100)
+  price Int
+  description String @db.Text
+  image String[]
+  stock Int
+  categoryId Int
+  category Category @relation(fields: [categoryId], references: [id])
+  variantId Int
+  variant Variant[]
+  review Review[]
+  cart Cart[]
+  transaction Transaction[]
+  wishlist Wishlist[]
+}
+
+model Variant {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  type String @db.VarChar(100)
+  name String @db.VarChar(100)
+  price Int?
+  productId Int
+  product Product @relation(fields: [productId], references: [id])
+  cart Cart[]
+  review Review[]
+  transaction Transaction[]
+  wishlist Wishlist[]
+}
+
+model Review {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  rating Int
+  testimonial String @db.Text
+  productId Int
+  product Product @relation(fields: [productId], references: [id])
+  variant Variant[]
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Cart {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  productId Int
+  product Product @relation(fields: [productId], references: [id])
+  variant Variant[]
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Transaction {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status String
+  product Product[]
+  variant Variant[]
+  amount Int
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Wishlist {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  productId Int
+  product Product @relation(fields: [productId], references: [id])
+  variant Variant[]
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Coupon {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  name String @db.VarChar(50)
+  discount Int
+  exp DateTime
+}
